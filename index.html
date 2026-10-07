@@ -1,0 +1,803 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title></title>
+<meta name="color-scheme" content="light dark">
+<script>
+  (function(){
+    try{
+      var key = 'sok-index-theme';
+      var theme = localStorage.getItem(key) || '나이테';
+      if (!/^(나이테|황혼|윤슬|쪽빛|미리내)$/.test(theme)) theme = '나이테';
+      document.documentElement.setAttribute('data-theme', theme);
+      document.documentElement.style.colorScheme = /^(쪽빛|미리내)$/.test(theme) ? 'dark' : 'light';
+    }catch(e){
+      document.documentElement.setAttribute('data-theme', '나이테');
+    }
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="assets/themes.css">
+<style>
+  /* 테마 변수 5세트는 assets/themes.css 한 파일에서 관리한다 (index·문항 페이지 공용). */
+  :root{--maxw:1000px}
+
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--ground);
+    color:var(--ink);
+    font-family:Pretendard,'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.6;
+    word-break:keep-all;
+    transition:background .25s ease, color .25s ease;
+  }
+  .mono{font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace}
+
+  /* ---------- THEME PICKER ---------- */
+  .theme-dock{
+    position:fixed; top:34px; right:22px; z-index:1000;
+    display:inline-flex; align-items:center; justify-content:flex-end;
+    width:auto; max-width:calc(100% - 44px); margin:0;
+  }
+  .theme-picker{
+    display:inline-flex; align-items:center; gap:4px; flex-wrap:wrap;
+    width:auto; max-width:100%;
+    background:var(--switch-bg); border:1px solid color-mix(in srgb, var(--gold) 35%, transparent); border-radius:999px;
+    padding:4px; box-shadow:0 8px 22px rgba(0,0,0,.13); backdrop-filter:blur(10px);
+  }
+  .theme-picker button{
+    border:0; background:transparent; color:var(--switch-text); cursor:pointer;
+    font:700 12.5px/1 Pretendard,'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',system-ui,sans-serif;
+    padding:8px 11px; border-radius:999px; transition:background .16s ease, color .16s ease, box-shadow .16s ease;
+  }
+  .theme-picker button:hover{color:var(--hero-ink)}
+  .theme-picker button[aria-pressed="true"]{
+    color:var(--hero-ink); background:color-mix(in srgb, var(--gold) 22%, transparent);
+    box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--gold) 68%, transparent);
+  }
+  .theme-picker button:focus-visible{outline:2px solid var(--gold-soft); outline-offset:2px}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative; overflow:hidden;
+    background:radial-gradient(125% 120% at 50% -18%, var(--hero-1) 0%, var(--hero-2) 52%, var(--hero-3) 100%);
+    color:var(--hero-text); padding:92px 22px 110px; text-align:center;
+    border-bottom:1px solid var(--hero-border);
+    transition:background .25s ease, color .25s ease, border-color .25s ease;
+  }
+  .hero::after{
+    content:""; position:absolute; inset:0;
+    background-image:
+      linear-gradient(var(--hero-grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--hero-grid) 1px, transparent 1px);
+    background-size:48px 48px;
+    -webkit-mask-image:radial-gradient(circle at 50% 32%, #000 0%, transparent 72%);
+    mask-image:radial-gradient(circle at 50% 32%, #000 0%, transparent 72%);
+    pointer-events:none;
+  }
+  .hero-inner{position:relative; z-index:2; max-width:760px; margin:0 auto}
+
+  .mark{width:118px; height:118px; margin:0 auto 26px; display:block}
+  .mark .ring-rot{transform-origin:60px 60px; animation:spin 26s linear infinite; stroke:var(--gold-deep)}
+  .mark .draw{stroke-dasharray:1; stroke-dashoffset:1; animation:draw 1.1s ease forwards .15s; stroke:var(--gold-soft)}
+  .mark .core{stroke:var(--gold-deep)}
+  .mark .ray{stroke:var(--gold-soft)}
+  .mark .pip{fill:var(--gold-deep)}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes draw{to{stroke-dashoffset:0}}
+
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:10px;
+    font-size:12px; font-weight:700; letter-spacing:.32em;
+    color:var(--gold-deep); text-transform:uppercase; margin:0 0 22px;
+  }
+  [data-theme="쪽빛"] .eyebrow{color:var(--gold-soft)}
+  .eyebrow .bar{width:26px; height:1px; background:linear-gradient(90deg,transparent,var(--gold))}
+  .eyebrow .bar.r{background:linear-gradient(90deg,var(--gold),transparent)}
+
+  .title{
+    font-family:'Nanum Myeongjo',serif; font-weight:800;
+    font-size:clamp(40px, 9vw, 78px); line-height:1.05; letter-spacing:-.01em;
+    margin:0; color:var(--hero-ink); text-shadow:0 2px 30px rgba(0,0,0,.10);
+  }
+  [data-theme="쪽빛"] .title{text-shadow:0 2px 30px rgba(0,0,0,.25)}
+  .title .pick{color:var(--gold-deep); position:relative; white-space:nowrap}
+  [data-theme="쪽빛"] .title .pick{color:var(--gold-soft)}
+  .title .pick::after{
+    content:""; position:absolute; left:2%; right:2%; bottom:.06em; height:.09em;
+    background:linear-gradient(90deg,transparent,var(--gold),transparent); border-radius:2px;
+  }
+
+  .tagline{margin:26px auto 0; max-width:30em; font-size:clamp(15px,2.4vw,18px); color:var(--hero-sub); letter-spacing:-.01em}
+  .count-pill{
+    display:inline-flex; align-items:center; gap:9px; margin-top:30px; padding:8px 16px;
+    border:1px solid color-mix(in srgb, var(--gold) 40%, transparent); border-radius:999px; color:var(--gold-deep); font-size:13px; font-weight:600;
+  }
+  [data-theme="쪽빛"] .count-pill{color:var(--gold-soft)}
+  .count-pill .dot{width:6px; height:6px; border-radius:50%; background:var(--gold)}
+  [data-theme="황혼"] .count-pill{
+    border-color:rgba(111,47,39,.52);
+    background:rgba(255,250,245,.18);
+  }
+  [data-theme="윤슬"] .count-pill{
+    border-color:rgba(7,90,120,.50);
+    background:rgba(251,253,255,.22);
+  }
+  [data-theme="나이테"] .count-pill{
+    border-color:rgba(104,67,14,.50);
+    background:rgba(255,253,248,.22);
+  }
+  [data-theme="나이테"] .mark .ring-rot{opacity:.72}
+  [data-theme="나이테"] .mark .draw{opacity:.95}
+
+  /* ---------- INDEX GRID ---------- */
+  .sheet{max-width:var(--maxw); margin:0 auto; padding:54px 22px 30px}
+  .sheet-head{
+    display:flex; align-items:baseline; flex-wrap:wrap; gap:14px; margin:0 0 26px; padding-bottom:16px;
+    border-bottom:1px solid var(--line);
+  }
+  .sheet-head .label{font-size:13px; font-weight:700; letter-spacing:.22em; color:var(--gold-deep); text-transform:uppercase}
+  [data-theme="쪽빛"] .sheet-head .label,
+  [data-theme="미리내"] .sheet-head .label{color:var(--gold-soft)}
+  .sheet-head .hint{font-size:13.5px; color:var(--muted)}
+
+  /* ---------- 정렬 토글 (강의순 ↔ 교수별) ---------- */
+  .sort-toggle{
+    margin-left:auto; align-self:center;
+    display:inline-flex; align-items:center; gap:3px;
+    background:var(--switch-bg);
+    border:1px solid color-mix(in srgb, var(--gold) 35%, transparent);
+    border-radius:999px; padding:3px; backdrop-filter:blur(10px);
+  }
+  .sort-toggle button{
+    border:0; background:transparent; color:var(--switch-text); cursor:pointer;
+    font:700 12.5px/1 Pretendard,'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',system-ui,sans-serif;
+    padding:7px 12px; border-radius:999px;
+    transition:background .16s ease, color .16s ease, box-shadow .16s ease;
+  }
+  .sort-toggle button:hover{color:var(--hero-ink)}
+  .sort-toggle button[aria-pressed="true"]{
+    color:var(--gold-deep); background:color-mix(in srgb, var(--gold) 22%, transparent);
+    box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--gold) 68%, transparent);
+  }
+  [data-theme="쪽빛"] .sort-toggle button[aria-pressed="true"],
+  [data-theme="미리내"] .sort-toggle button[aria-pressed="true"]{color:var(--gold-soft)}
+  .sort-toggle button:focus-visible{outline:2px solid var(--gold-soft); outline-offset:2px}
+  .sort-toggle button:disabled{opacity:.5; cursor:default}
+
+  .grid{display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:14px}
+  @media (max-width:680px){ .grid{grid-template-columns:1fr} }
+
+  /* ---------- 교수별 묶음 머리글 (grid 한 줄 전체 차지) ----------
+     [교수 이름] [한 줄 평 · pages.js의 PROF_NOTE_ENC]        [강의 수]
+     ──────────────────────────────────────────────────────────  */
+  .group-head{
+    grid-column:1 / -1;
+    display:flex; align-items:baseline; gap:12px;
+    margin:22px 2px 6px; padding-bottom:9px;
+    background:linear-gradient(90deg, color-mix(in srgb, var(--gold) 50%, transparent), transparent) left bottom / 100% 1px no-repeat;
+  }
+  .group-head:first-child{margin-top:0}
+  .group-head .who{
+    flex:0 0 auto;
+    font-family:'Nanum Myeongjo',serif; font-weight:800; font-size:18px;
+    letter-spacing:-.01em; color:var(--gold-deep);
+  }
+  [data-theme="쪽빛"] .group-head .who,
+  [data-theme="미리내"] .group-head .who{color:var(--gold-soft)}
+  .group-head .note{
+    flex:0 1 auto; min-width:0;
+    font-size:13.5px; line-height:1.5; color:var(--muted); letter-spacing:-.01em;
+  }
+  .group-head .cnt{
+    flex:0 0 auto; margin-left:auto;
+    font-size:11.5px; font-weight:700; color:var(--muted);
+    border:1px solid var(--line); border-radius:999px; padding:3px 9px;
+  }
+  /* 좁은 화면: 한 줄 평을 이름 아래로 내린다 */
+  @media (max-width:560px){
+    .group-head{flex-wrap:wrap; gap:3px 10px}
+    .group-head .who{order:1}
+    .group-head .cnt{order:2}
+    .group-head .note{order:3; flex:1 1 100%}
+  }
+
+  .card{
+    position:relative; display:flex; align-items:center; gap:18px;
+    background:var(--paper); border:1px solid var(--line); border-radius:16px;
+    padding:18px 20px; text-decoration:none; color:var(--ink);
+    box-shadow:var(--card-shadow);
+    transition:transform .16s ease, border-color .16s ease, box-shadow .16s ease, background .25s ease, color .25s ease;
+  }
+  .card .num{flex:0 0 auto; font-size:14px; font-weight:700; color:var(--muted); letter-spacing:.04em; transition:color .16s ease}
+  .card .rule{flex:0 0 auto; width:1px; height:30px; background:var(--line); transition:background .16s ease}
+  .card .name{flex:1 1 auto; font-size:16.5px; font-weight:600; letter-spacing:-.015em; line-height:1.35}
+  .card .go{flex:0 0 auto; color:var(--go); font-size:19px; transition:transform .18s ease, color .16s ease}
+  .card:hover{transform:translateY(-2px); border-color:var(--gold); box-shadow:var(--card-shadow-hover)}
+  .card:hover .num{color:var(--gold-deep)}
+  .card:hover .rule{background:var(--gold)}
+  .card:hover .go{transform:translateX(4px); color:var(--gold-deep)}
+  .card:focus-visible{outline:2px solid var(--blue); outline-offset:3px}
+
+  .empty{
+    grid-column:1 / -1; text-align:center; color:var(--muted);
+    padding:46px 22px; background:var(--paper); border:1px dashed var(--line); border-radius:16px; font-size:15px;
+  }
+  .empty code{background:var(--empty-code); padding:2px 7px; border-radius:6px; color:var(--ink); font-family:'JetBrains Mono',monospace; font-size:13px}
+
+  /* ---------- FOOTER ---------- */
+  .foot{max-width:var(--maxw); margin:0 auto; padding:34px 22px 60px; text-align:center; color:var(--muted)}
+  .foot .fmark{width:30px; height:30px; margin:0 auto 12px; display:block; opacity:.72}
+  .foot .fmark .line{stroke:var(--gold-deep)}
+  .foot .fmark .pip{fill:var(--gold-deep)}
+  .foot .sig{font-family:'Nanum Myeongjo',serif; font-weight:700; font-size:16px; color:var(--ink); letter-spacing:.02em}
+  .foot .meta{font-size:12.5px; margin-top:5px}
+
+  @media (max-width:560px){
+    .theme-dock{top:18px; right:14px; left:14px; max-width:none; justify-content:flex-end}
+    .theme-picker{border-radius:18px; justify-content:flex-end}
+    .theme-picker button{padding:8px 10px}
+    .hero{padding-top:108px}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .mark .ring-rot{animation:none}
+    .mark .draw{animation:none; stroke-dashoffset:0}
+    .card, body, .hero{transition:none}
+  }
+
+  /* ---------- INDEX LOCK: 잠금 전에는 hero의 입력 카드만 표시 ---------- */
+  body[data-unlocked="false"] .locked-content{display:none!important}
+  body[data-unlocked="true"] .unlock-card{display:none!important}
+  body[data-unlocked="true"] .locked-content{display:block}
+  .unlock-card{
+    position:relative; z-index:3; max-width:420px; margin:0 auto;
+    background:color-mix(in srgb, var(--paper) 90%, transparent);
+    border:1px solid color-mix(in srgb, var(--gold) 42%, var(--hero-border)); border-radius:22px;
+    padding:24px 22px 22px; box-shadow:0 18px 42px rgba(0,0,0,.14);
+    backdrop-filter:blur(12px); text-align:left; color:var(--ink);
+  }
+  [data-theme="쪽빛"] .unlock-card,
+  [data-theme="미리내"] .unlock-card{
+    background:color-mix(in srgb, var(--paper) 86%, rgba(8,14,31,.72));
+    box-shadow:0 18px 46px rgba(0,0,0,.30);
+  }
+  .unlock-card .lock-label{
+    display:inline-flex; align-items:center; gap:8px; margin:0 0 12px;
+    font-size:12px; font-weight:800; letter-spacing:.24em; text-transform:uppercase;
+    color:var(--gold-deep);
+  }
+  [data-theme="쪽빛"] .unlock-card .lock-label,
+  [data-theme="미리내"] .unlock-card .lock-label{color:var(--gold-soft)}
+  .unlock-card h1{
+    margin:0 0 8px; font-family:'Nanum Myeongjo',serif;
+    font-size:clamp(25px,5vw,34px); line-height:1.15; color:var(--ink);
+  }
+  [data-theme="쪽빛"] .unlock-card h1,
+  [data-theme="미리내"] .unlock-card h1{color:var(--hero-ink)}
+  .unlock-card p{margin:0 0 16px; color:var(--muted); font-size:14px}
+  [data-theme="쪽빛"] .unlock-card p,
+  [data-theme="미리내"] .unlock-card p{color:var(--hero-sub)}
+  .unlock-row{display:flex; gap:8px; align-items:center}
+  .unlock-row input{
+    flex:1 1 auto; min-width:0; border:1px solid var(--line); border-radius:12px;
+    padding:12px 13px; background:color-mix(in srgb, var(--paper) 96%, white); color:var(--ink); font:inherit;
+    outline:none; caret-color:var(--gold-deep);
+  }
+  [data-theme="쪽빛"] .unlock-row input,
+  [data-theme="미리내"] .unlock-row input{
+    background:color-mix(in srgb, var(--paper) 78%, #0d1634);
+    border-color:color-mix(in srgb, var(--gold) 28%, var(--line));
+    color:var(--ink);
+  }
+  .unlock-row input::placeholder{color:color-mix(in srgb, var(--muted) 76%, transparent)}
+  .unlock-row input:focus{border-color:var(--gold); box-shadow:0 0 0 3px color-mix(in srgb, var(--gold) 20%, transparent)}
+  .unlock-row button{
+    flex:0 0 auto; border:0; border-radius:12px; padding:12px 15px;
+    background:var(--gold-deep); color:var(--paper); font:800 14px/1 Pretendard,'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',system-ui,sans-serif; cursor:pointer;
+  }
+  [data-theme="쪽빛"] .unlock-row button,
+  [data-theme="미리내"] .unlock-row button{color:#142047}
+  .unlock-row button:hover{background:var(--gold)}
+  .unlock-row button:disabled{opacity:.55; cursor:default}
+  .unlock-msg{min-height:20px; margin-top:11px; font-size:13px; color:var(--muted)}
+  [data-theme="쪽빛"] .unlock-msg,
+  [data-theme="미리내"] .unlock-msg{color:var(--hero-sub)}
+  @media (max-width:560px){
+    .unlock-row{flex-direction:column}
+    .unlock-row input,.unlock-row button{width:100%}
+  }
+
+</style>
+</head>
+<body data-lock-page="index" data-unlocked="false">
+
+  <header class="hero">
+    <div class="theme-dock" role="group" aria-label="테마 선택">
+      <div class="theme-picker" id="themePicker">
+        <button type="button" data-theme-choice="나이테" aria-pressed="true">나이테</button>
+        <button type="button" data-theme-choice="황혼" aria-pressed="false">황혼</button>
+        <button type="button" data-theme-choice="윤슬" aria-pressed="false">윤슬</button>
+        <button type="button" data-theme-choice="쪽빛" aria-pressed="false">쪽빛</button>
+        <button type="button" data-theme-choice="미리내" aria-pressed="false">미리내</button>
+      </div>
+    </div>
+
+    <div class="hero-inner">
+      <svg class="mark" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+        <circle class="ring-rot" cx="60" cy="60" r="52" stroke-width="1" stroke-dasharray="3 7" opacity=".55"/>
+        <circle class="draw" cx="60" cy="60" r="38" stroke-width="1.5" pathLength="1" opacity=".85"/>
+        <circle class="core" cx="60" cy="60" r="22" stroke-width="1.5"/>
+        <line class="ray" x1="60" y1="6" x2="60" y2="30" stroke-width="1.5"/>
+        <line class="ray" x1="60" y1="90" x2="60" y2="114" stroke-width="1.5"/>
+        <line class="ray" x1="6" y1="60" x2="30" y2="60" stroke-width="1.5"/>
+        <line class="ray" x1="90" y1="60" x2="114" y2="60" stroke-width="1.5"/>
+        <circle class="pip" cx="60" cy="60" r="4.5"/>
+      </svg>
+
+      <section class="unlock-card" aria-label="비밀번호 입력">
+        <div class="lock-label">Locked</div>
+        <h1>신경과학</h1>
+        <p>비밀번호를 입력해 주십시오.</p>
+        <div class="unlock-row">
+          <input id="indexPassphrase" type="password" autocomplete="off" placeholder="문자열 입력" aria-label="비밀번호">
+          <button id="indexUnlockBtn" type="button">해제</button>
+        </div>
+        <div class="unlock-msg" id="indexUnlockMsg" aria-live="polite"></div>
+      </section>
+
+      <div class="locked-content">
+        <p class="eyebrow"><span class="bar"></span><span id="site-eyebrow"></span><span class="bar r"></span></p>
+        <h1 class="title" id="site-title"></h1>
+        <p class="tagline" id="site-tagline"></p>
+        <div class="count-pill"><span class="dot"></span><span class="mono" id="count">0 SETS</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="sheet locked-content">
+    <div class="sheet-head">
+      <span class="label">Index</span>
+      <span class="hint">주제를 골라 바로 풀어보세요.</span>
+      <div class="sort-toggle" id="sortToggle" role="group" aria-label="목록 정렬 방식">
+        <button type="button" data-sort="num"  aria-pressed="true">강의순</button>
+        <button type="button" data-sort="prof" aria-pressed="false">교수별</button>
+      </div>
+    </div>
+    <div class="grid" id="grid"></div>
+  </main>
+
+  <footer class="foot locked-content">
+    <svg class="fmark" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+      <circle class="line" cx="60" cy="60" r="40" stroke-width="2.5"/>
+      <line class="line" x1="60" y1="8" x2="60" y2="30" stroke-width="2.5"/>
+      <line class="line" x1="60" y1="90" x2="60" y2="112" stroke-width="2.5"/>
+      <line class="line" x1="8" y1="60" x2="30" y2="60" stroke-width="2.5"/>
+      <line class="line" x1="90" y1="60" x2="112" y2="60" stroke-width="2.5"/>
+      <circle class="pip" cx="60" cy="60" r="7"/>
+    </svg>
+    <div class="sig" id="foot-title"></div>
+    <div class="meta mono"><span id="foot-count">0</span> SETS · ORACLE</div>
+  </footer>
+
+
+  <script id="indexUnlockPayload" type="application/json">
+{
+  "kdf": "PBKDF2",
+  "hash": "SHA-256",
+  "iterations": 600000,
+  "cipher": "AES-GCM",
+  "salt": "ccZglmqzec+/MxkceRznew==",
+  "iv": "ERz80Of96+x9nRUU",
+  "data": "0ijbqUKPdv0RY53UmdASZ4RVV/46ptrITklDYD3lZgTeRYiGdE8="
+}
+  </script>
+
+  <!-- 강의 목록(번호·제목·교수)은 pages.js의 TOC_ENC 한 곳에서만 관리합니다 -->
+  <script src="pages.js"></script>
+  <!-- 테마 적용은 assets/theme.js 한 파일에서 관리 -->
+  <script src="assets/theme.js"></script>
+  <script>
+    (function () {
+      function esc(s){ return String(s).replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
+      function escAttr(s){ return esc(s).replace(/"/g, '&quot;'); }
+      function fileToName(f){ return String(f).replace(/\.html?$/i, '').replace(/[_-]+/g, ' ').trim(); }
+      function pad(n){ n = String(n); while (n.length < 4) n = '0' + n; return n; }
+      function pad2(n){ n = String(n); while (n.length < 2) n = '0' + n; return n; }
+
+      var grid = document.getElementById('grid');
+      var countEl = document.getElementById('count');
+      var fc = document.getElementById('foot-count');
+      var sortToggle = document.getElementById('sortToggle');
+      if (!grid) return;
+
+      // 강의 번호 목록은 pages.js TOC_ENC의 키에서 나온다 (잠금 해제 후 채워짐).
+      // 예전의 window.PAGE_NUMBERS 배열은 더 이상 쓰지 않는다.
+      var PAGE_NUMS = [];
+      var buildSeq = 0;
+
+      // 파일명 접두어 — pages.js의 window.FILE_PREFIX 한 곳에서 관리한다.
+      var FILE_PREFIX = window.FILE_PREFIX || 'np';
+
+      /* ── 교수별 묶기 설정 — 여기 세 줄만 고치면 된다 ──────────
+         GROUP_ORDER : 'name'  교수 이름 가나다순
+                       'first' 그 교수의 첫 강의 강의순 (강의 진행 순서를 따라감)
+         UNKNOWN     : subtitle에서 '22: 이름'을 못 찾은 페이지가 모이는 묶음 이름
+         SCAN_LIMIT  : 교수 정보를 훑을 때 한 번에 처리할 페이지 수 */
+      var GROUP_ORDER = 'name';
+      var UNKNOWN     = '교수 미상';
+      var SCAN_LIMIT  = 6;
+
+      /* ── 목차 캐시 ──────────────────────────────────────────
+         해제된 세션에서 cNNNN들을 매번 다시 내려받아 복호화하지 않도록,
+         한 번 완성된(복호화까지 끝난) 목차를 sessionStorage에 저장해 둔다.
+         · 같은 세션(비밀번호 재입력 없이 오갈 수 있는 동안)에서만 유효
+         · TOC_ENC가 바뀌면(강의 추가·수정) sig 불일치로 자동 폐기
+         · 탭/브라우저를 닫으면 비밀번호와 함께 사라짐(sessionStorage) */
+      var TOC_CACHE_KEY  = 'sok-index-toc-v1';
+      var PROF_CACHE_KEY = 'sok-index-prof-v1';   // 번호→교수 (세션 캐시)
+      var SORT_KEY       = 'sok-index-sort-v1';   // 마지막으로 고른 정렬 (localStorage)
+      var UNLOCKED_FLAG  = 'sok-site-unlocked-v1';
+      // 캐시 서명: TOC_ENC 암호문이 바뀌면(강의 추가·제목·교수 수정) 캐시를 자동 폐기한다.
+      // 번호·제목·교수가 전부 TOC_ENC 하나에 있으므로 서명도 이 하나로 충분하다.
+      function tocSig(){
+        var enc = (window.TOC_ENC && window.TOC_ENC.data) ? String(window.TOC_ENC.data).slice(0, 24) : '';
+        return 'v5|' + enc;
+      }
+      function hasUnlockedSession(){
+        try { return sessionStorage.getItem(UNLOCKED_FLAG) === '1'; } catch (e) { return false; }
+      }
+      function readTocCache(){
+        if (!hasUnlockedSession()) return null;       // 해제된 세션에서만 캐시 사용
+        try {
+          var obj = JSON.parse(sessionStorage.getItem(TOC_CACHE_KEY) || 'null');
+          if (obj && obj.sig === tocSig() && Array.isArray(obj.pages)) return obj.pages;
+        } catch (e) {}
+        return null;
+      }
+      function writeTocCache(pages){
+        try { sessionStorage.setItem(TOC_CACHE_KEY, JSON.stringify({ sig: tocSig(), pages: pages })); }
+        catch (e) {}
+      }
+      function readProfCache(){
+        if (!hasUnlockedSession()) return null;
+        try {
+          var obj = JSON.parse(sessionStorage.getItem(PROF_CACHE_KEY) || 'null');
+          if (obj && obj.sig === tocSig() && obj.map && typeof obj.map === 'object') return obj.map;
+        } catch (e) {}
+        return null;
+      }
+      function writeProfCache(map){
+        try { sessionStorage.setItem(PROF_CACHE_KEY, JSON.stringify({ sig: tocSig(), map: map })); }
+        catch (e) {}
+      }
+      function readSort(){
+        try { return localStorage.getItem(SORT_KEY) === 'prof' ? 'prof' : 'num'; } catch (e) { return 'num'; }
+      }
+      function writeSort(mode){
+        try { localStorage.setItem(SORT_KEY, mode); } catch (e) {}
+      }
+
+      /* ── 교수 이름 읽기 ────────────────────────────────────
+         1순위는 pages.js TOC_ENC의 교수 칸이다("번호": ["제목", "교수"]).
+         아래 subtitle 추출은 교수 칸이 비어 있는 번호를 위한 폴백이다 —
+         그 페이지 pageMetaPayload의 subtitle에서 읽는다.
+           "20, 21: X; 22: 홍길동; ..."  →  '22:' 다음부터 ';' 앞까지
+         · 22 바로 앞이 숫자면 무시한다 → '2022: ...' 같은 건 안 걸린다
+         · 세미콜론이 없으면 문자열 끝까지를 이름으로 본다
+
+         이름 뒤에 부가 정보를 적고 싶으면 아래 PROF_CUT 구분자를 하나 둔다.
+         구분자부터 뒤는 묶기에서 통째로 무시되므로 뭘 적어도 안전하다.
+         (TOC_ENC의 교수 칸에도 같은 구분자 규칙이 적용된다.)
+
+           "22: 홍길동;"                → 홍길동
+           "22: 홍길동 (신규 강의);"     → 홍길동
+           "22: 홍길동(정형외과);"       → 홍길동
+           "22: 홍길동 · 3문항;"         → 홍길동
+           "22: 홍길동, 부교수;"         → 홍길동
+           "22: 홍길동 / 대체 강의;"     → 홍길동
+           "22: 김 철수 (2시간);"        → 김 철수   ← 이름 안의 띄어쓰기는 살아남는다
+
+         구분자를 늘리려면 PROF_CUT의 [ ] 안에 문자를 더 넣는다.
+         '-'와 '.'은 일부러 뺐다 — 'Kim Sung-ho', 'Prof. Kim' 같은 이름이 잘린다. */
+      var RE_PROF  = /(?:^|[^0-9])22\s*:\s*([^;]+)/;
+      var PROF_CUT = /[(（\[［{·・,，、\/|]/;
+
+      function cutName(s){
+        return String(s == null ? '' : s).split(PROF_CUT)[0].trim().replace(/[\s.·]+$/, '');
+      }
+      function profOf(subtitle){
+        var m = RE_PROF.exec(String(subtitle == null ? '' : subtitle));
+        return m ? cutName(m[1]) : '';
+      }
+
+      // 아직 암호화하지 않은(평문 JSON) 페이로드도 그대로 읽을 수 있게 한다.
+      // 복호화는 됐는데 JSON이 깨진 경우(쉼표 누락 등)는 콘솔에 평문을 찍어 알려 준다.
+      async function decryptJSON(raw){
+        if (raw && typeof raw === 'object' && typeof raw.data !== 'string') return raw;
+        var txt = await window.SOK_LOCK.decryptStoredPayload(raw);
+        try { return JSON.parse(txt); }
+        catch (e) {
+          console.warn('[SOK] 복호화는 성공했지만 JSON 파싱에 실패했습니다. 복호화된 평문:\n', txt);
+          throw e;
+        }
+      }
+
+      async function profOfPage(num){
+        try {
+          var res = await fetch(FILE_PREFIX + pad(num) + '.html');
+          if (!res.ok) return '';
+          var doc = new DOMParser().parseFromString(await res.text(), 'text/html');
+          var el = doc.getElementById('pageMetaPayload');
+          if (!el) return '';
+          var raw = window.SOK_LOCK.parsePayloadText
+            ? window.SOK_LOCK.parsePayloadText(el.textContent)
+            : JSON.parse(el.textContent);
+          var meta = await decryptJSON(raw);
+          return profOf(meta && meta.subtitle);
+        } catch (e) {
+          return '';
+        }
+      }
+
+      /* 번호→교수 지도를 만든다.
+         ① 1순위: pages.js TOC_ENC 각 항목 ["제목", "교수"]의 교수 칸.
+            목차를 그릴 때 이미 복호화해 둔 것을 그대로 쓰므로 공짜다.
+            전부 채워져 있으면 파일을 하나도 내려받지 않는다. (권장)
+         ② 교수 칸이 빈 번호만 그 페이지를 내려받아 subtitle("22: 이름")에서
+            뽑는다 — 예전 방식 그대로라, 이미 배포한 파일들은 손대지 않아도 된다.
+         결과는 세션 캐시에 넣어 두 번 다시 읽지 않는다. */
+      async function loadProfMap(onProgress){
+        var cached = readProfCache();
+        if (cached) return cached;
+
+        var map = Object.create(null);
+
+        if (window.SOK_LOCK && window.SOK_LOCK.loadToc) {
+          try {
+            var toc = await window.SOK_LOCK.loadToc();   // { "번호": { t, p } }
+            if (toc) {
+              Object.keys(toc).forEach(function (k) {
+                var v = cutName(toc[k].p);               // TOC의 교수 칸에도 같은 이름 규칙 적용
+                if (v) map[k] = v;
+              });
+            }
+          } catch (e) { /* 실패하면 아래 스캔으로 폴백 */ }
+        }
+
+        var queue = PAGE_NUMS.filter(function (n) { return !map[String(n)]; });
+        var total = queue.length;
+        var done = 0;
+
+        async function worker(){
+          while (queue.length){
+            var n = queue.shift();
+            var who = await profOfPage(n);
+            if (who) map[String(n)] = who;
+            done++;
+            if (onProgress) onProgress(done, total);
+          }
+        }
+        var workers = [];
+        for (var i = 0; i < Math.min(SCAN_LIMIT, total); i++) workers.push(worker());
+        await Promise.all(workers);
+
+        if (Object.keys(map).length) writeProfCache(map);
+        return map;
+      }
+
+      /* ── 교수 한 줄 평 ─────────────────────────────────────
+         pages.js의 PROF_NOTE_ENC = { "홍길동": "강의록을 다 읽어줌.", ... }
+         · 키는 np 파일에서 뽑아낸 교수 이름과 같아야 한다.
+           '홍길동.'처럼 마침표를 붙여 적어도 같은 규칙으로 맞춰 준다.
+         · TOC_ENC와 같은 방식으로 암호화한다. 없으면 이름만 뜬다.
+         · 세션당 1회만 복호화한다(유도 키는 unlock.js가 이미 캐시함). */
+      var _notePromise = null;
+      function loadProfNotes(){
+        if (!window.PROF_NOTE_ENC || !window.SOK_LOCK) return Promise.resolve(null);
+        if (!_notePromise) {
+          _notePromise = decryptJSON(window.PROF_NOTE_ENC).then(function (obj) {
+            var out = Object.create(null);
+            if (obj && typeof obj === 'object') {
+              Object.keys(obj).forEach(function (k) {
+                var who = cutName(k);
+                var txt = String(obj[k] == null ? '' : obj[k]).trim();
+                if (who && txt) out[who] = txt;
+              });
+            }
+            return out;
+          });
+          _notePromise.catch(function () { _notePromise = null; });
+        }
+        return _notePromise;
+      }
+
+      // 교수별 화면에 필요한 것 두 가지(번호→교수, 교수→한 줄 평)를 한꺼번에 준비한다.
+      async function ensureProfData(onProgress){
+        var r = await Promise.all([
+          profMap ? Promise.resolve(profMap) : loadProfMap(onProgress),
+          loadProfNotes().catch(function () { return null; })
+        ]);
+        profMap   = r[0];
+        profNotes = r[1] || Object.create(null);
+      }
+
+      /* ── 화면 상태 ─────────────────────────────────────────
+         pagesData : [{n, file, name, ord}] — 항상 번호 오름차순
+         profMap   : {"100":"홍길동", ...}          번호 → 교수 (np 파일에서 추출)
+         profNotes : {"홍길동":"강의록 다 읽어줌.", ...}  교수 → 한 줄 평 (pages.js에서 직접 작성)
+         sortMode  : 'num' | 'prof' */
+      var pagesData = [];
+      var profMap   = readProfCache();
+      var profNotes = null;
+      var sortMode  = readSort();
+      var scanning  = false;
+
+      function setPages(list){
+        // ord = 강의순으로 매긴 일련번호. 교수별로 묶어도 카드의 번호는 그대로 유지된다.
+        pagesData = list.map(function (p, i) { p.ord = i + 1; return p; });
+        PAGE_NUMS = pagesData.map(function (p) { return p.n; });   // 번호 목록도 여기서 파생
+        if (countEl) countEl.textContent = pagesData.length + ' SETS';
+        if (fc) fc.textContent = pagesData.length;
+      }
+
+      function syncToggle(){
+        if (!sortToggle) return;
+        var btns = sortToggle.querySelectorAll('[data-sort]');
+        for (var i = 0; i < btns.length; i++){
+          btns[i].setAttribute('aria-pressed', String(btns[i].getAttribute('data-sort') === sortMode));
+          btns[i].disabled = scanning;
+        }
+      }
+
+      function cardHTML(p){
+        return '<a class="card" href="' + escAttr(p.file) + '">' +
+                 '<span class="num mono">' + pad2(p.ord) + '</span><span class="rule"></span>' +
+                 '<span class="name">' + esc(p.name) + '</span><span class="go">→</span>' +
+               '</a>';
+      }
+
+      function groupedHTML(){
+        var groups = Object.create(null);
+        var order = [];
+        pagesData.forEach(function (p) {                    // pagesData는 강의순이므로
+          var who = (profMap && profMap[String(p.n)]) || UNKNOWN;
+          if (!groups[who]) { groups[who] = []; order.push(who); }
+          groups[who].push(p);                              // 묶음 안도 자동으로 강의순
+        });
+        order.sort(function (a, b) {
+          if (a === UNKNOWN) return 1;                      // 못 읽은 건 항상 맨 뒤
+          if (b === UNKNOWN) return -1;
+          if (GROUP_ORDER === 'first') return groups[a][0].n - groups[b][0].n;
+          return a.localeCompare(b, 'ko');
+        });
+
+        var html = '';
+        order.forEach(function (who) {
+          var note = (who !== UNKNOWN && profNotes) ? (profNotes[who] || '') : '';
+          html += '<div class="group-head">' +
+                    '<span class="who">' + esc(who) + '</span>' +
+                    (note ? '<span class="note">' + esc(note) + '</span>' : '') +
+                    '<span class="cnt mono">' + groups[who].length + '</span>' +
+                  '</div>' +
+                  groups[who].map(cardHTML).join('');
+        });
+        return html;
+      }
+
+      function renderGrid(){
+        syncToggle();
+        if (!pagesData.length) {
+          grid.innerHTML = '<div class="empty"><code>npNNNN.html</code>(예: <code>np0100.html</code>) 이름으로 파일을 올리고, <code>pages.js</code>의 <code>TOC_ENC</code>에 <code>"번호": ["제목", "교수"]</code> 한 줄을 추가하면 여기에 나타납니다.</div>';
+          return;
+        }
+        grid.innerHTML = (sortMode === 'prof' && profMap) ? groupedHTML() : pagesData.map(cardHTML).join('');
+      }
+
+      /* 정렬 바꾸기. '교수별'을 처음 누르면 그때 교수 정보를 읽는다(지연 로딩).
+         한 번 읽으면 세션 캐시에 남아 이후로는 즉시 전환된다. */
+      async function setSort(mode){
+        sortMode = (mode === 'prof') ? 'prof' : 'num';
+        writeSort(sortMode);
+
+        if (sortMode !== 'prof') { renderGrid(); return; }
+
+        // 교수 정보(이름·한 줄 평)는 암호화돼 있으므로 해제된 뒤에만 읽을 수 있다.
+        // (unlock.js가 아직 로드되기 전이면 일단 그려 두고, 해제 이벤트에서 다시 그린다.)
+        if (!window.SOK_LOCK || !window.SOK_LOCK.isUnlocked || !window.SOK_LOCK.isUnlocked()) {
+          renderGrid();
+          return;
+        }
+
+        var needScan = !profMap;   // 캐시가 없으면 준비 필요 (TOC의 교수 칸이 다 차 있으면 스캔 없이 즉시 끝난다)
+        if (needScan) {
+          scanning = true;
+          syncToggle();
+          grid.innerHTML = '<div class="empty">강의를 교수별로 모으는 중… <span class="mono" id="scanProg"></span></div>';
+        }
+        try {
+          await ensureProfData(function (done, total) {
+            var el = document.getElementById('scanProg');
+            if (el) el.textContent = done + ' / ' + total;
+          });
+        } catch (e) { /* 실패하면 아래에서 강의순 모양으로 그려진다 */ }
+        scanning = false;
+        renderGrid();
+      }
+
+      if (sortToggle) {
+        sortToggle.addEventListener('click', function (e) {
+          var btn = e.target.closest('[data-sort]');
+          if (!btn || btn.disabled) return;
+          setSort(btn.getAttribute('data-sort'));
+        });
+      }
+
+      var renderedFromCache = false;
+
+      function draw(){
+        // 저장된 정렬이 '교수별'이면 필요한 교수 정보를 이어서 읽는다.
+        if (sortMode === 'prof') setSort('prof');
+        else renderGrid();
+      }
+
+      async function buildGrid() {
+        var seq = ++buildSeq;
+        grid.innerHTML = '<div class="empty"> 처리 중...</div>';
+        // 강의 목록의 단일 출처: pages.js의 TOC_ENC(번호→[제목,교수], 암호화)를
+        // 1회 복호화하면 번호·제목·교수가 한 번에 나온다. 파일 다운로드가 없다.
+        var toc = null;
+        if (window.SOK_LOCK && window.SOK_LOCK.loadToc) {
+          try { toc = await window.SOK_LOCK.loadToc(); } catch (e) { toc = null; }
+        }
+        if (seq !== buildSeq) return;
+        if (!toc) { setPages([]); renderGrid(); return; }   // TOC_ENC가 비어 있으면 안내문 표시
+
+        var nums = Object.keys(toc)
+          .map(Number)
+          .filter(function (n) { return isFinite(n); })
+          .sort(function (a, b) { return a - b; });
+
+        setPages(nums.map(function (n) {
+          var file = FILE_PREFIX + pad(n) + '.html';
+          return { n: n, file: file, name: toc[String(n)].t || fileToName(file) };
+        }));
+        // 복호화된 제목으로 완성된 목차만 캐시에 저장한다.
+        if (pagesData.length) writeTocCache(pagesData);
+        draw();
+      }
+
+      // 이미 해제된 세션이고 캐시가 현재 목록과 맞으면, 받아오지 말고 즉시 그린다.
+      var cached = readTocCache();
+      if (cached && cached.length) {
+        renderedFromCache = true;
+        setPages(cached);
+        draw();
+      } else {
+        syncToggle();
+      }
+
+      // 캐시로 이미 정확히 그렸다면 해제 이벤트가 와도 다시 빌드하지 않는다.
+      window.addEventListener('sok:index-unlocked', function () {
+        if (!profMap) profMap = readProfCache();   // 해제 직후에야 세션 캐시를 읽을 수 있다
+        // 캐시로 그렸더라도 그 캐시가 이미 폐기됐다면(저장된 비밀번호 검증 실패 등)
+        // 화면에 남은 목차는 낡은 것이므로 다시 빌드한다.
+        if (renderedFromCache && readTocCache()) { draw(); return; }
+        buildGrid();
+      });
+
+      // 잠금 상태에서는 목차(.locked-content)가 어차피 숨겨져 있으므로
+      // 미리 빌드하지 않는다. 해제되면 sok:index-unlocked 이벤트가 buildGrid()를 부른다.
+    })();
+  </script>
+  <script src="assets/unlock.js"></script>
+
+</body>
+</html>

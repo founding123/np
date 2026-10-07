@@ -1,0 +1,73 @@
+/* ============================================================
+   테마 변수 5세트 — index.html과 문항 페이지(question_set.css) 공용.
+   테마 색을 바꿀 땐 이 파일 한 곳만 고치면 된다.
+   · 선택된 테마는 localStorage 'sok-index-theme'로 공유
+   · 적용·전환 로직은 assets/theme.js
+   · 페이지별로 다른 값(--maxw 등)은 각 페이지 CSS에서 덮어쓴다
+   ============================================================ */
+:root,
+[data-theme="나이테"]{
+  --hero-1:#fff8ec; --hero-2:#efe1c8; --hero-3:#d8c49d;
+  --ground:#f5f0e6; --paper:#fffdf8;
+  --ink:#202538; --muted:#6d7182; --line:#e6dccb;
+  --gold:#9d6f1d; --gold-soft:#c88f2a; --gold-deep:#68430e;
+  --blue:#356c9d;
+  --hero-ink:#202538; --hero-text:#202538; --hero-sub:#606274;
+  --hero-grid:rgba(104,67,14,.16); --hero-border:rgba(104,67,14,.32);
+  --card-shadow:0 4px 14px rgba(80,61,30,.06);
+  --card-shadow-hover:0 12px 26px rgba(80,61,30,.13);
+  --go:#b1a48c; --empty-code:#f0e7d6;
+  --switch-bg:rgba(255,253,248,.78); --switch-text:#6d7182;
+}
+[data-theme="황혼"]{
+  --hero-1:#fff2dc; --hero-2:#efb98c; --hero-3:#8f5f7a;
+  --ground:#f5e7dc; --paper:#fffaf5;
+  --ink:#2f2530; --muted:#796978; --line:#ead3c5;
+  --gold:#a9462f; --gold-soft:#c85736; --gold-deep:#6f2f27;
+  --blue:#7a6ea8;
+  --hero-ink:#2f2530; --hero-text:#2f2530; --hero-sub:#4b3038;
+  --hero-grid:rgba(111,47,39,.18); --hero-border:rgba(111,47,39,.34);
+  --card-shadow:0 4px 14px rgba(112,73,52,.07);
+  --card-shadow-hover:0 12px 26px rgba(112,73,52,.15);
+  --go:#ad8a7a; --empty-code:#f2dccd;
+  --switch-bg:rgba(255,250,245,.82); --switch-text:#796978;
+}
+[data-theme="윤슬"]{
+  --hero-1:#f1fbff; --hero-2:#ccebf3; --hero-3:#99cfe0;
+  --ground:#e4f4f8; --paper:#fbfdff;
+  --ink:#1d2b38; --muted:#5f7686; --line:#c0dce9;
+  --gold:#137f9f; --gold-soft:#0f6f93; --gold-deep:#075a78;
+  --blue:#2877aa;
+  --hero-ink:#1c2a35; --hero-text:#1c2a35; --hero-sub:#526d7d;
+  --hero-grid:rgba(7,90,120,.17); --hero-border:rgba(7,90,120,.34);
+  --card-shadow:0 4px 14px rgba(48,117,150,.07);
+  --card-shadow-hover:0 12px 26px rgba(48,117,150,.14);
+  --go:#82a4b5; --empty-code:#d8edf6;
+  --switch-bg:rgba(251,253,255,.82); --switch-text:#5f7686;
+}
+[data-theme="쪽빛"]{
+  --hero-1:#283f78; --hero-2:#182b5c; --hero-3:#101d42;
+  --ground:#1f2e59; --paper:#2a3b6c;
+  --ink:#edf4ff; --muted:#c0ccea; --line:rgba(174,198,255,.24);
+  --gold:#a9c5ff; --gold-soft:#dce8ff; --gold-deep:#8fb0f6;
+  --blue:#bfd3ff;
+  --hero-ink:#f4f8ff; --hero-text:#edf4ff; --hero-sub:#cdd9f7;
+  --hero-grid:rgba(174,198,255,.07); --hero-border:rgba(174,198,255,.22);
+  --card-shadow:0 4px 18px rgba(0,0,0,.22);
+  --card-shadow-hover:0 16px 34px rgba(0,0,0,.32);
+  --go:#b8c9ef; --empty-code:rgba(255,255,255,.10);
+  --switch-bg:rgba(19,32,70,.82); --switch-text:#c8d5f4;
+}
+[data-theme="미리내"]{
+  --hero-1:#42345f; --hero-2:#2a2448; --hero-3:#1a1732;
+  --ground:#26233b; --paper:#312b4d;
+  --ink:#f2ecf7; --muted:#c2bbd2; --line:rgba(214,212,248,.20);
+  --gold:#c9c8ff; --gold-soft:#efedff; --gold-deep:#aeb1f2;
+  --blue:#c5b7ff;
+  --hero-ink:#fff7ff; --hero-text:#f8effb; --hero-sub:#d7d0e8;
+  --hero-grid:rgba(239,237,255,.065); --hero-border:rgba(239,237,255,.18);
+  --card-shadow:0 4px 18px rgba(0,0,0,.24);
+  --card-shadow-hover:0 16px 34px rgba(0,0,0,.34);
+  --go:#9d96b8; --empty-code:rgba(255,255,255,.10);
+  --switch-bg:rgba(34,29,54,.76); --switch-text:#d4cee5;
+}
